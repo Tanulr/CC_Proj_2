@@ -1,4 +1,13 @@
 import pika, sys, os
+import mysql.connector 
+mydb = mysql.connector.connect(
+    host = "localhost",
+    user = "root",
+    password = "Apravamthe@98",
+    database = "animalshelter"
+)
+
+c = mydb.cursor()
 
 def main():
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
@@ -8,6 +17,7 @@ def main():
 
     def callback(ch, method, properties, body):
         print(" [x] Received %r" % body)
+        # Have to write code for deletion from database here
 
     channel.basic_consume(queue='', on_message_callback=callback, auto_ack=True)
 

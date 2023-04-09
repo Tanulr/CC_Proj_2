@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import pika, os, logging, time
 logging.basicConfig()
 
@@ -37,19 +37,32 @@ def healthcheck():
     print("[x] message sent to consumer = "+bodys)
     return "healthcheck"
 
-@app.route('/two')
+@app.route('/two', methods = ['POST', 'GET'])
 def insert():
-    bodys = "Consumer 2"
-    channel.basic_publish(exchange='', routing_key='two', body = bodys)
-    return "insert"
+    
+    if request.method == "POST":
+        SRN = request.form.get("SRN")
+        name = request.form.get("Name")
+        bodys = SRN + " " + name
+        channel.basic_publish(exchange='', routing_key='two', body = bodys)
+
+        return render_template("insert.html")
+        #    return "Your name is "+SRN + name
+    return render_template("insert.html")
+    
     
 
-@app.route('/three')
+@app.route('/three', methods = ['POST', 'GET'])
 def delete():
-    bodys = "Consumer 3"
-    channel.basic_publish(exchange='', routing_key='three', body = bodys)
+    if request.method == "POST":
+        SRN = request.form.get("SRN")
 
-    return "delete"
+        bodys = SRN 
+        channel.basic_publish(exchange='', routing_key='three', body = bodys)
+
+        return render_template("delete.html")
+        #    return "Your name is "+SRN + name
+    return render_template("delete.html")
 
 @app.route('/four')
 def read():
