@@ -13,6 +13,10 @@ mydb = mysql.connector.connect(
 
 c = mydb.cursor()
 
+def addDetails(SRN, Name):
+    c.execute('INSERT INTO Student(SRN, Name) VALUES (%s, %s)', (SRN, Name))
+    mydb.commit()
+
 def main():
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
@@ -21,6 +25,11 @@ def main():
 
     def callback(ch, method, properties, body):
         print(" [x] Received %r" % body)
+        SRN = body.split(" ")[0]
+        Name = body.split(" ")[1]
+        addDetails(SRN, Name)
+        print(" [x] Inserted into database %r" % body)
+
         # Have to write code for insertion into database here
 
     channel.basic_consume(queue='', on_message_callback=callback, auto_ack=True)

@@ -1,13 +1,21 @@
 import pika, sys, os
+from dotenv import load_dotenv
 import mysql.connector 
+
+load_dotenv()
+
 mydb = mysql.connector.connect(
     host = "localhost",
     user = "root",
-    password = "Apravamthe@98",
-    database = "animalshelter"
+    password = os.getenv("MYSQL_PASSWORD"),
+    database = "studentdb"
 )
 
 c = mydb.cursor()
+
+def deleteData(SRN):
+    c.execute('DELETE FROM student WHERE SRN="{}"'.format(SRN))
+    mydb.commit()
 
 def main():
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
@@ -17,6 +25,9 @@ def main():
 
     def callback(ch, method, properties, body):
         print(" [x] Received %r" % body)
+        SRN = body.split(" ")[0]
+        deleteData(SRN)
+        print(" [x] Deleted from database %r" % body)
         # Have to write code for deletion from database here
 
     channel.basic_consume(queue='', on_message_callback=callback, auto_ack=True)

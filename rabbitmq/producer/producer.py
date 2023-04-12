@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 import pika, os, logging, time
 logging.basicConfig()
-
+ 
 url = os.environ.get('CLOUDAMQP_URL','amqp://guest:guest@localhost/%2f')
 params = pika.URLParameters(url)
 params.socket_timeout = 5
@@ -64,12 +64,15 @@ def delete():
         #    return "Your name is "+SRN + name
     return render_template("delete.html")
 
-@app.route('/four')
+@app.route('/four', methods = ['POST', 'GET'])
 def read():
-    bodys = "Consumer 4"
-    channel.basic_publish(exchange='', routing_key='four', body = bodys)
+    if request.method == "POST":
+        bodys = "Read database request received"
+        channel.basic_publish(exchange='', routing_key='four', body = bodys)
 
-    return "read"
+        return render_template("read.html")
+        #    return "Your name is "+SRN + name
+    return render_template("read.html")
 
 if __name__ =='__main__':
     app.run(debug = True)
