@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request
-import pika, os, logging, time
+import pika, os, logging
 logging.basicConfig()
  
-url = os.environ.get('CLOUDAMQP_URL','amqp://guest:guest@localhost/%2f')
-params = pika.URLParameters(url)
-params.socket_timeout = 5
+# url = os.environ.get('CLOUDAMQP_URL','amqp://guest:guest@localhost/%2f')
+# params = pika.URLParameters(url)
+# params.socket_timeout = 5
 
-connection = pika.BlockingConnection(params)
+connection = pika.BlockingConnection(pika.ConnectionParameters(host = "rabbitmq3"))
 channel = connection.channel()
 
 channel.queue_declare(queue = 'one')
@@ -75,4 +75,4 @@ def read():
     return render_template("read.html")
 
 if __name__ =='__main__':
-    app.run(debug = True)
+    app.run(debug = True, port=8080)
