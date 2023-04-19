@@ -6,7 +6,7 @@ logging.basicConfig()
 # params = pika.URLParameters(url)
 # params.socket_timeout = 5
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(host = "rabbitmq3"))
+connection = pika.BlockingConnection(pika.ConnectionParameters(host=os.environ['RabbitMQ_host'],heartbeat=1000))
 channel = connection.channel()
 
 channel.queue_declare(queue = 'one')

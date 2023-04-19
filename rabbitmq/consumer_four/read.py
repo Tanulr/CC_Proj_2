@@ -1,25 +1,17 @@
 import pika, sys, os
-from dotenv import load_dotenv
-import mysql.connector 
+from pymongo import MongoClient
 
-load_dotenv()
+host = MongoClient("mongodb_micro")
 
-mydb = mysql.connector.connect(
-    host = "localhost",
-    user = "root",
-    password = os.getenv("MYSQL_PASSWORD"),
-    database = "studentdb"
-)
-
-c = mydb.cursor()
+db = host["studentdb"]
+collection = db["student"]
 
 def readData():
-    c.execute('SELECT * FROM student')
-    data = c.fetchall()
+    data = collection.find()
     return data
 
 def main():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=os.environ['RabbitMQ_host'],heartbeat=1000))
     channel = connection.channel()
 
     channel.queue_declare(queue='four')

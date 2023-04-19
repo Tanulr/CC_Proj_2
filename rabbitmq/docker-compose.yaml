@@ -1,7 +1,7 @@
 version: "3.8"
 services:
-    rabbitmq3:
-        container_name: "rabbitmq3"
+    rabbitmq:
+        container_name: "rabbitmq"
         image: rabbitmq:3-management
         ports:
             - "5672:5672"
@@ -9,13 +9,92 @@ services:
         environment:
             - RABBITMQ_DEFAULT_USER=guest
             - RABBITMQ_DEFAULT_PASS=guest
+        networks:
+            - rabbitmq_net
+        healthcheck:
+            test: [ "CMD", "rabbitmqctl", "status"]
+            interval: 5s
+            timeout: 20s
+            retries: 5
+    mongodb_micro:
+        container_name: "mongodb_micro"   
+        image: mongo:4.2.3-bionic
+        
+        ports:
+            - 27017:27017
+        environment:
+            - MONGO_INITDB_DATABASE=test
+            - MONGO_INITDB_ROOT_USERNAME=admin
+            - MONGO_INITDB_ROOT_PASSWORD=admin
+        
+        networks:
+            - mongo_net
+        restart: on-failure
+
     producer:
         build: ./producer
         depends_on:
-            - rabbitmq3
+            - rabbitmq
         tty: true
         ports:
             - "8080:8080"
         volumes:
             - './producer:/producer'
+        networks:
+            - micro_net
+            - mongo_net
+        restart: on-failure
+    consumer_one:
+        build: ./consumer_one
+        depends_on:
+            - rabbitmq
+        tty: true
+        networks:
+            - micro_net
+            - mongo_net
+        environment:
+            - RabbitMQ_host="rabbitmq"
+        restart: on-failure
+    consumer_two:
+        build: ./consumer_two
+        depends_on:
+            - rabbitmq
+        tty: true
+        networks:
+            - micro_net
+            - mongo_net
+        environment:
+            - RabbitMQ_host="rabbitmq"
+        restart: on-failure
+    consumer_three:
+        build: ./consumer_three
+        depends_on:
+            - rabbitmq
+        tty: true
+        networks:
+            - micro_net
+            - mongo_net
+        environment:
+            - RabbitMQ_host="rabbitmq"
+        restart: on-failure
+    consumer_four:
+        build: ./consumer_four
+        depends_on:
+            - rabbitmq
+        tty: true
+        
+        networks:
+            - micro_net
+            - mongo_net
+        environment:
+            - RabbitMQ_host="rabbitmq"
+        restart: on-failure
+        
+networks:
+    micro_net:
+        driver: bridge
+    rabbitmq_net:
+        driver: bridge
+    mongo_net:
+        driver: bridge
     
