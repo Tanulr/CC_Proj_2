@@ -1,13 +1,46 @@
 version: "3.8"
 services:
+  rabbitmq:
+    container_name: "rabbitmq"
+    image: rabbitmq:3-management-alpine
+    ports:
+        - 5672:5672
+        - 15672:15672
+    expose:
+        - 5672:5672
+        - 15672:15672 
+    environment:
+        - RABBITMQ_DEFAULT_USER=guest
+        - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+        - rabbitmq_net
+    restart: always
   worker:
     build: ./worker
+    tty: true
+    depends_on:
+      - rabbitmq
     ports:
-      - "8080:8080"
+      - "5000:5000"
+    volumes:
+      - ./worker:/worker
     networks:
+      - rabbitmq_net
       - backend
     restart: always
-
+  listener:
+    build: ./listener
+    depends_on:
+        - rabbitmq
+    tty: true
+    volumes:
+      - ./listener:/listener
+    networks:
+        - rabbitmq_net
+        - backend
+    restart: always
 networks:
   backend:
     driver: bridge
+  rabbitmq_net:
+        driver: bridge

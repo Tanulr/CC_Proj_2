@@ -11,7 +11,7 @@ def readData():
     return data
 
 def main():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=os.environ['RabbitMQ_host'],heartbeat=1000))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq',heartbeat=1000))
     channel = connection.channel()
 
     channel.queue_declare(queue='four')

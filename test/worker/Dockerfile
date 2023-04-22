@@ -1,8 +1,11 @@
-FROM python:3.9.10-alpine3.14
-WORKDIR /srv
-RUN pip install --upgrade pip
-RUN pip install flask
-EXPOSE 5000
-COPY . /srv
-ENV FLASK_APP=app
-CMD ["python","app.py"]
+FROM python:3.7-alpine
+
+WORKDIR /python-docker
+
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+
+COPY . .
+
+# CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+CMD [ "python", "app.py"]
