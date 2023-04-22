@@ -1,34 +1,41 @@
 import pika, sys, os
-from dotenv import load_dotenv
-import mysql.connector 
+import psycopg2
 
-load_dotenv()
 
-mydb = mysql.connector.connect(
-    host = "localhost",
-    user = "root",
-    password = os.getenv("MYSQL_PASSWORD"),
-    database = "studentdb"
+mydb = psycopg2.connect(
+    host="postgres",
+    user="root",
+    database="student_db",
+    password="password",
+    port = 5432
 )
 
 c = mydb.cursor()
 
 def addDetails(SRN, Name):
-    c.execute('INSERT INTO Student(SRN, Name) VALUES (%s, %s)', (SRN, Name))
-    mydb.commit()
+    try:
+        c.execute('INSERT INTO Student(SRN, sname) VALUES (%s, %s)', (SRN, Name))
+        mydb.commit()
+    except Exception as e:
+        print(f"Error inserting into database: {e}")
+        mydb.rollback()
+    
 
 def main():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq',heartbeat=1000))
     channel = connection.channel()
 
     channel.queue_declare(queue='two')
 
     def callback(ch, method, properties, body):
         print(" [x] Received %r" % body)
+        body = body.decode()
         SRN = body.split(" ")[0]
         Name = body.split(" ")[1]
         addDetails(SRN, Name)
-        print(" [x] Inserted into database %r" % body)
+        print(" [x] Successfully inserted into database %r" % body)
+        # ch.basic_ack(delivery_tag=method.delivery_tag)
+        
 
         # Have to write code for insertion into database here
 

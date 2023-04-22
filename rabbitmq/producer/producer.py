@@ -6,13 +6,14 @@ logging.basicConfig()
 # params = pika.URLParameters(url)
 # params.socket_timeout = 5
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(host = "rabbitmq3"))
+connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq',heartbeat=1000))
 channel = connection.channel()
 
 channel.queue_declare(queue = 'one')
 channel.queue_declare(queue = 'two')
 channel.queue_declare(queue = 'three')
 channel.queue_declare(queue = 'four')
+
 
 
 # for x in range(1000):
@@ -75,4 +76,4 @@ def read():
     return render_template("read.html")
 
 if __name__ =='__main__':
-    app.run(debug = True, port=8080)
+    app.run(debug = True, port=8080, host='0.0.0.0')

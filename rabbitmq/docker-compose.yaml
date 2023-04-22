@@ -1,21 +1,118 @@
 version: "3.8"
 services:
-    rabbitmq3:
-        container_name: "rabbitmq3"
-        image: rabbitmq:3-management
+    rabbitmq:
+        container_name: "rabbitmq"
+        image: rabbitmq:3-management-alpine
         ports:
             - "5672:5672"
             - "15672:15672"
         environment:
             - RABBITMQ_DEFAULT_USER=guest
             - RABBITMQ_DEFAULT_PASS=guest
+        networks:
+            - rabbitmq_net
+        restart: always
+    postgres:
+        image: postgres:13.1
+        # healthcheck:
+        #     test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
+        #     timeout: 45s
+        #     interval: 10s
+        #     retries: 10
+        restart: always
+        environment:
+            - POSTGRES_USER=root
+            - POSTGRES_PASSWORD=password
+            - APP_DB_USER=docker
+            - APP_DB_PASS=docker
+            - APP_DB_NAME=student_db
+        networks:
+            - sql_net
+        volumes:
+            - ./db:/docker-entrypoint-initdb.d/
+        ports:
+            - 5432:5432
+
     producer:
         build: ./producer
         depends_on:
-            - rabbitmq3
+            - rabbitmq
         tty: true
         ports:
             - "8080:8080"
         volumes:
             - './producer:/producer'
+        networks:
+            - rabbitmq_net
+            - micro_net
+            - sql_net
+        restart: on-failure
+    consumer_one:
+        build: ./consumer_one
+        depends_on:
+            - rabbitmq
+            - postgres
+        tty: true
+        volumes:
+            - './consumer_one:/consumer_one'
+        networks:
+            - rabbitmq_net
+            - micro_net
+            - sql_net
+        environment:
+            - RabbitMQ_host="rabbitmq"
+        restart: on-failure
+    consumer_two:
+        build: ./consumer_two
+        depends_on:
+            - rabbitmq
+            - postgres
+        tty: true
+        volumes:
+            - './consumer_two:/consumer_two'
+        networks:
+            - rabbitmq_net
+            - micro_net
+            - sql_net
+        environment:
+            - RabbitMQ_host="rabbitmq"
+        restart: on-failure
+    consumer_three:
+        build: ./consumer_three
+        depends_on:
+            - rabbitmq
+            - postgres
+        tty: true
+        volumes:
+            - './consumer_three:/consumer_three'
+        networks:
+            - rabbitmq_net
+            - micro_net
+            - sql_net
+        environment:
+            - RabbitMQ_host="rabbitmq"
+        restart: on-failure
+    consumer_four:
+        build: ./consumer_four
+        depends_on:
+            - rabbitmq
+            - postgres
+        tty: true
+        volumes:
+            - './consumer_four:/consumer_four'
+        networks:
+            - rabbitmq_net
+            - micro_net
+            - sql_net
+        environment:
+            - RabbitMQ_host="rabbitmq"
+        restart: on-failure
+        
+networks:
+    micro_net:
+        driver: bridge
+    rabbitmq_net:
+        driver: bridge
+    sql_net:
+        driver: bridge
     

@@ -1,33 +1,43 @@
 import pika, sys, os
-from dotenv import load_dotenv
-import mysql.connector 
+import psycopg2
 
-load_dotenv()
 
-mydb = mysql.connector.connect(
-    host = "localhost",
-    user = "root",
-    password = os.getenv("MYSQL_PASSWORD"),
-    database = "studentdb"
+mydb = psycopg2.connect(
+    host="postgres",
+    user="root",
+    database="student_db",
+    password="password",
+    port = 5432
 )
 
 c = mydb.cursor()
 
 def readData():
-    c.execute('SELECT * FROM student')
-    data = c.fetchall()
-    return data
+    
+    try:
+        c.execute('SELECT * FROM student')
+        data = c.fetchall()
+        return data
+    except Exception as e:
+        print(f"Error reading from database: {e}")
+
+
 
 def main():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq',heartbeat=1000))
     channel = connection.channel()
 
     channel.queue_declare(queue='four')
 
     def callback(ch, method, properties, body):
         print(" [x] Received %r" % body)
+        
+        
         data = readData()
         print(data)
+        
+        
+    
 
 
     channel.basic_consume(queue='', on_message_callback=callback, auto_ack=True)
