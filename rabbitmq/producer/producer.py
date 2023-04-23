@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request
 import pika, os, logging
 logging.basicConfig()
+from pymongo import MongoClient
+
  
 # url = os.environ.get('CLOUDAMQP_URL','amqp://guest:guest@localhost/%2f')
 # params = pika.URLParameters(url)
@@ -14,6 +16,10 @@ channel.queue_declare(queue = 'two')
 channel.queue_declare(queue = 'three')
 channel.queue_declare(queue = 'four')
 
+host = MongoClient("mongodb_micro")
+
+db = host["studentdb"]
+collection = db["student"]
 
 # for x in range(1000):
 #     bodys = 'data ke' + str(x+1)

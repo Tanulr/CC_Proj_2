@@ -19,8 +19,10 @@ def main():
 
     def callback(ch, method, properties, body):
         print(" [x] Received %r" % body)
-        SRN = body.split(" ")[0]
-        Name = body.split(" ")[1]
+        print(type(body))
+        strbody = str(body).split(" ")
+        SRN = strbody[0]
+        Name = strbody[1]
         addDetails(SRN, Name)
         print(" [x] Inserted into database %r" % body)
 
