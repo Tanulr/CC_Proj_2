@@ -3,13 +3,18 @@ from pymongo import MongoClient
 
 # host = MongoClient("172.17.0.2")
 host = MongoClient("mongodb_micro")
-
 db = host["studentdb"]
 collection = db["student"]
 
 def addDetails(SRN, Name):
+    
+
     data = {"Name:":Name,"SRN":SRN}
-    collection.insert_one(data)
+    try:
+        collection.insert_one(data)
+        print(collection.find_one({"SRN":SRN}))
+    except Exception as e:
+        print(e)
 
 def main():
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq',heartbeat=1000))
@@ -19,10 +24,20 @@ def main():
 
     def callback(ch, method, properties, body):
         print(" [x] Received %r" % body)
-        print(type(body))
+        #print(type(body))
+        body = body.decode()
         strbody = str(body).split(" ")
+        print(strbody)
         SRN = strbody[0]
         Name = strbody[1]
+
+        # host = MongoClient("mongodb_micro")
+        # db = host["studentdb"]
+        # collection = db["student"]
+
+        # data = {"Name:":Name,"SRN":SRN}
+        # collection.insert_one(data)
+        # print(collection.find_one({"SRN":SRN}))
         addDetails(SRN, Name)
         print(" [x] Inserted into database %r" % body)
 

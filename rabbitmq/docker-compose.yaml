@@ -14,15 +14,9 @@ services:
         restart: always
     mongodb_micro:
         container_name: "mongodb_micro"   
-        image: mongo:4.2.3-bionic
-        
+        image: mongo
         ports:
-            - 27018:27017
-        environment:
-            - MONGO_INITDB_DATABASE=test
-            - MONGO_INITDB_ROOT_USERNAME=admin
-            - MONGO_INITDB_ROOT_PASSWORD=admin
-        
+            - 27017:27017
         networks:
             - mongo_net
         restart: always

@@ -9,7 +9,7 @@ collection = db["student"]
 
 
 def deleteData(SRN):
-    collection.remove({"SRN":SRN})
+    collection.delete_one({'SRN':SRN})
 
 def main():
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq',heartbeat=1000))
@@ -19,7 +19,8 @@ def main():
 
     def callback(ch, method, properties, body):
         print(" [x] Received %r" % body)
-        SRN = body.split(" ")[0]
+        SRN = str(body)[2:-1]
+        print(SRN)
         deleteData(SRN)
         print(" [x] Deleted from database %r" % body)
         # Have to write code for deletion from database here

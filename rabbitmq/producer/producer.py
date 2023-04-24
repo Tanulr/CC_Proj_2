@@ -16,13 +16,13 @@ channel.queue_declare(queue = 'two')
 channel.queue_declare(queue = 'three')
 channel.queue_declare(queue = 'four')
 
-host = MongoClient("mongodb_micro")
+# host = MongoClient("mongodb_micro")
 
-db = host["studentdb"]
-collection = db["student"]
+# db = host["studentdb"]
+# collection = db["student"]
 
-data = {"Name:":"Name","SRN":"SRN"}
-collection.insert_one(data)
+# data = {"Name:":"Name","SRN":"SRN"}
+# collection.insert_one(data)
 
 # for x in range(1000):
 #     bodys = 'data ke' + str(x+1)

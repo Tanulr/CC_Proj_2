@@ -19,8 +19,8 @@ def main():
     def callback(ch, method, properties, body):
         print(" [x] Received %r" % body)
         data = readData()
-        print(data)
-
+        for x in data:
+            print(x)
 
     channel.basic_consume(queue='', on_message_callback=callback, auto_ack=True)
 
