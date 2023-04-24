@@ -1,54 +1,27 @@
 # CC Project 2
 
-## Installing dependencies
-
-##### RabbitMQ docker image download
-```console
-docker pull rabbitmq:3-management
-```
-##### python dependencies
-```console
-pip install pika
-pip install flask
-pip install os
-pip install logging 
-pip install time
-pip install python-dotenv
-pip install mysql
-```
-
 ## Running the application
 
-**Step 1**:
-
-We’ll map port 15672 for the management web app and port 5672 for the message broker.
-
+Open a terminal and navigate to the **rabbitmq** directory.
+Run the following command to run the application
 ```console
-docker run --rm -it -p 15672:15672 -p 5672:5672 rabbitmq:3-management
+docker-compose up
 ```
 
-Assuming that ran successfully, you’ve got an instance of RabbitMQ running! Bounce over to http://localhost:15672 to check out the management web app.
+The individual microservices might give errors for upto a minute because rabbitMQ takes a while to start-up completely. Once rabbitMQ is up and running you can see that the consumers are waiting for messages from the producer and the producer flask app is live.
 
-**Step 2**
+To look at individual queues created on the rabbitMQ message broker, open http://127.0.0.1:15672 where the rabbitMQ management app is deployed. Use credentials **guest** for both username and password.
 
-Open a terminal and split into 4 panes( <kbd>alt</kbd> + <kbd>shift</kbd> + <kbd>+</kbd> for vertical splitting and <kbd>alt</kbd> + <kbd>shift</kbd> + <kbd>-</kbd> for horizontal splitting). 
-Run a consumer in each pane.
+Open http://127.0.0.1:8080 where the flask app is deployed.
 
-```console
-python healthcheck.py
-python insertion.py
-python deletion.py
-python read.py
-```
+## Microservices
 
-Now run the producer file in a different terminal window.
-
-```console
-python producer.py
-```
-Once everything is up and running, open http://127.0.0.1:5000, navigate to the routes and enter necessary details and check the terminals where the consumers are running to see the output.
-
-
-
-
+1. **Healthcheck**
+    Checks whether the connection to RabbitMQ brocker is established.
+2. **Insert into database**
+    Insert tuples into the database. The two values are SRN and Student Name.
+3. **Delete from database**
+    Deletes tuples based on the SRN given.
+4. **Read database**
+    Reads the database and prints the values on the terminal.
 

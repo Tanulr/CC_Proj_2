@@ -14,7 +14,7 @@ c = mydb.cursor()
 
 def deleteData(SRN):
     try:
-        c.execute('DELETE FROM student WHERE SRN="{}"'.format(SRN))
+        c.execute("DELETE FROM student WHERE SRN='{}'".format(SRN))
         mydb.commit()
     except Exception as e:
         print(f"Error deleting from database: {e}")
@@ -30,7 +30,7 @@ def main():
         print(" [x] Received %r" % body)
         body = body.decode()
         SRN = body.split(" ")[0]
-        deleteData(SRN)
+        deleteData(str(SRN))
         print(" [x] Successfully deleted from database %r" % body)
         # ch.basic_ack(delivery_tag=method.delivery_tag)
         

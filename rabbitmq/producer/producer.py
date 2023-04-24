@@ -1,10 +1,6 @@
 from flask import Flask, render_template, request
 import pika, os, logging
 logging.basicConfig()
- 
-# url = os.environ.get('CLOUDAMQP_URL','amqp://guest:guest@localhost/%2f')
-# params = pika.URLParameters(url)
-# params.socket_timeout = 5
 
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq',heartbeat=1000))
 channel = connection.channel()
@@ -14,16 +10,12 @@ channel.queue_declare(queue = 'two')
 channel.queue_declare(queue = 'three')
 channel.queue_declare(queue = 'four')
 
+channel.exchange_declare(exchange='microservices', exchange_type='direct')
 
-
-# for x in range(1000):
-#     bodys = 'data ke' + str(x+1)
-#     channel.basic_publish(exchange='', routing_key='pdfprocess', body = bodys)
-#     print("[x] message sent to consumer = "+bodys)
-#     a = x%100
-#     if a==0:
-#         time.sleep(2)
-# connection.close()
+channel.queue_bind(exchange='microservices', queue='one', routing_key='one')
+channel.queue_bind(exchange='microservices', queue='two', routing_key='two')
+channel.queue_bind(exchange='microservices', queue='three', routing_key='three')
+channel.queue_bind(exchange='microservices', queue='four', routing_key='four')
 
 app = Flask(__name__)
 
@@ -33,10 +25,10 @@ def home():
 
 @app.route('/one', methods=['GET'])
 def healthcheck():
-    bodys = "Consumer 1"
+    bodys = "Health check request"
     channel.basic_publish(exchange='', routing_key='one', body = bodys)
     print("[x] message sent to consumer = "+bodys)
-    return "healthcheck"
+    return render_template('healthcheck.html')
 
 @app.route('/two', methods = ['POST', 'GET'])
 def insert():
