@@ -21,6 +21,9 @@ host = MongoClient("mongodb_micro")
 db = host["studentdb"]
 collection = db["student"]
 
+data = {"Name:":"Name","SRN":"SRN"}
+collection.insert_one(data)
+
 # for x in range(1000):
 #     bodys = 'data ke' + str(x+1)
 #     channel.basic_publish(exchange='', routing_key='pdfprocess', body = bodys)

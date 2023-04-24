@@ -17,7 +17,7 @@ services:
         image: mongo:4.2.3-bionic
         
         ports:
-            - 27017:27017
+            - 27018:27017
         environment:
             - MONGO_INITDB_DATABASE=test
             - MONGO_INITDB_ROOT_USERNAME=admin
